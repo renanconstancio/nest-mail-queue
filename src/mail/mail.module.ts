@@ -13,9 +13,6 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    BullModule.registerQueue({
-      name: 'mail-queue',
-    }),
     MailerModule.forRoot({
       transport: {
         host: process.env.MAIL_HOST,
@@ -27,13 +24,13 @@ import { ConfigModule } from '@nestjs/config';
       },
     }),
   ],
-  controllers: [MailController],
-  providers: [MailProcessor],
+  controllers: [],
+  providers: [],
 })
 export class MailModule {
-  constructor(@InjectQueue('mail-queue') private queue: Queue) {}
-  configure(consumer: MiddlewareBuilder) {
-    const { router } = createBullBoard([new BullAdapter(this.queue)]);
-    consumer.apply(router).forRoutes('/admin/queue');
-  }
+  // constructor(@InjectQueue('mail-queue') private queue: Queue) {}
+  // configure(consumer: MiddlewareBuilder) {
+  //   const { router } = createBullBoard([new BullAdapter(this.queue)]);
+  //   consumer.apply(router).forRoutes('/admin/queue');
+  // }
 }

@@ -9,7 +9,7 @@ export class MailController {
 
   @Post()
   async sendMail(@Body() createMailDto: CreateMailDto) {
-    await this.mailQueue.add('send-mail', createMailDto, {
+    await this.mailQueue.add('mail-resolve', createMailDto, {
       attempts: 3,
       delay: 30,
     });

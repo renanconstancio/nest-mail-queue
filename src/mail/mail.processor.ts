@@ -7,7 +7,7 @@ import { CreateMailDto } from './create-mail.dto';
 export class MailProcessor {
   constructor(private readonly mailerService: MailerService) {}
 
-  @Process('send-mail')
+  @Process('mail-resolve')
   async handleSendMail(job: Job<CreateMailDto>) {
     console.log('Passou');
 
