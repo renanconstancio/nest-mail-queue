@@ -1,5 +1,12 @@
 import { InjectQueue } from '@nestjs/bull';
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Queue } from 'bull';
 import { CreateUploadDto } from './create-upload.tdo';
 
@@ -10,11 +17,12 @@ export class UploadController {
   ) {}
 
   @Post()
-  async handelUpdload(@Body() file: CreateUploadDto) {
-    await this.uploadQueue.add('upload-resolve', file, {
-      attempts: 1,
-      delay: 25,
-    });
+  @UseInterceptors(FileInterceptor('file'))
+  async handelUpdload(
+    @Body() createUploadDto: CreateUploadDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    await this.uploadQueue.add('upload-resolve', file.buffer.toString());
 
     return { asdf: 'asdf' };
   }
