@@ -5,6 +5,8 @@ import { Job } from 'bull';
 export class UploadProcessor {
   @Process('upload-resolve')
   async handleUpload(job: Job) {
-    return;
+    console.log('TESTE');
+    // console.log(job.data.file.buffer.toString());
+    // return;
   }
 }

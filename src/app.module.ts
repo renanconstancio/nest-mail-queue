@@ -3,6 +3,7 @@ import { BullModule, InjectQueue } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MiddlewareBuilder } from '@nestjs/core';
+import { MulterModule } from '@nestjs/platform-express/multer';
 import { Queue } from 'bull';
 import { createBullBoard } from 'bull-board';
 import { BullAdapter } from 'bull-board/bullAdapter';
@@ -14,33 +15,43 @@ import { UploadModule } from './upload/upload.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.MAIL_HOST,
-        port: Number(process.env.MAIL_PORT),
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASS,
+    MulterModule.registerAsync({
+      useFactory: () => ({
+        dest: './upload',
+      }),
+    }),
+    BullModule.forRootAsync({
+      useFactory: () => ({
+        redis: {
+          host: process.env.REDIS_HOST,
+          port: Number(process.env.REDIS_PORT),
         },
+      }),
+    }),
+    BullModule.registerQueueAsync(
+      {
+        name: 'mail-queue',
       },
-    }),
-    BullModule.registerQueue({
-      name: 'mail-queue',
-    }),
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: Number(process.env.REDIS_PORT),
+      {
+        name: 'upload-queue',
       },
-    }),
+    ),
+    MailModule,
+    UploadModule,
   ],
-  controllers: [MailController],
-  providers: [MailProcessor],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {
-  constructor(@InjectQueue('mail-queue') private queue: Queue) {}
+  constructor(
+    @InjectQueue('mail-queue') private mailQueue: Queue,
+    @InjectQueue('upload-queue') private uploadQueue: Queue,
+  ) {}
   configure(consumer: MiddlewareBuilder) {
-    const { router } = createBullBoard([new BullAdapter(this.queue)]);
+    const { router } = createBullBoard([
+      new BullAdapter(this.mailQueue),
+      new BullAdapter(this.uploadQueue),
+    ]);
     consumer.apply(router).forRoutes('/admin/queue');
   }
 }
