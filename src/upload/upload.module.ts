@@ -1,4 +1,4 @@
-import { BullModule, InjectQueue } from '@nestjs/bull';
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UploadController } from './upload.controlle';
