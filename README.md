@@ -63,14 +63,10 @@ Não esqueça de dar um copy no .env.dev, e preencha os dados nele corretamente
 
 ```bash
 REDIS_HOST=
-
 REDIS_PORT=
 
 MAIL_HOST=
-
 MAIL_PORT=
-
 MAIL_USER=
-
 MAIL_PASS=
 ```
